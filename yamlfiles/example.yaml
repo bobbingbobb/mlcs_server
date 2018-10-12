@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app:
+  template:
+    metadata:
+     labels:
+       app:
+    spec:
+      nodeSelector:
+      containers:
+      - name:
+        image:
+        ports:
+        - name: ssh
+          containerPort: 22
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+            memory:
+          requests:
+            memory:

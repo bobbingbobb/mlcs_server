@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+  <head>
+    <title>login</title>
+  </head>
+  <body>
+    <center>
+      <h1>login</h1>
+      <form action="{% url 'login' %}" method="get">
+        account:<input type="text" name="account" ><br>
+        password:<input type="text" name="passwd" ><br>
+        <input type="submit" value="login" />
+        <br><br>
+        <h3>{{ text }}</h3>
+      </form>
+    </center>
+  </body>
+</html>

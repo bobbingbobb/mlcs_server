@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: nmg-test}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: nmg-test}
+  template:
+    metadata:
+      labels: {app: nmg-test}
+    spec:
+      containers:
+      - image: ubuntu:16.04
+        name: nmg-test
+        ports:
+        - {containerPort: 22, name: ssh}
+        resources:
+          limits: {memory: 10Gi, nvidia.com/gpu: 1}
+          requests: {memory: 5.0Gi}
+      nodeSelector: {accelerator2: nvidia-tesla-k20x}

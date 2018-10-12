@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+  <title>NEEDS</title>
+  <head>
+    <h1>NEEDS</h1>
+  </head>
+  <body>
+    <form action="{% url 'select' %}" method="post">
+      {% csrf_token %}
+      <HR>
+      <h4>name of container</h4>
+      name: <input type="text" name="cname" required autofocus>
+      <HR>
+      <h4>GPU</h4>
+      <table>
+        {% for g in gpu %}
+          <input type="checkbox" name="gpuselect" value="{{ g.id }}">{{ g.name }}<br>
+        {% endfor %}
+      </table>
+      <HR>
+      <h4>RAM</h4>
+      ram: <input type="text" name="ram" required>Gb
+      <HR>
+      <h4>image</h4>
+      <select name=imageselect>
+        {% for i in image %}
+          <option value="{{ i.name }}">{{ i.name }}</option>
+        {% endfor %}
+      </select>
+      <HR>
+        {% for e in error %}
+          <p style="color: red">{{ e }}</p>
+        {% endfor %}
+      <input type="submit" value="add" name="submit">
+    </form>
+    <input type ="button" onclick="javascript:location.href='{% url 'index' %}'" value="back"></input>
+  </body>
+</html>
