@@ -6,29 +6,54 @@ from .models import GPU, Image, Port_in_use, Deployment, Counter
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, logout, login as server_login
 from django.contrib.auth.models import User
+import datetime
 import os
-#import string
+import string
+import re
 import yaml
 from django.core.files import File
 
 
 def index(request):
-  gpu = GPU.objects.order_by('id')
-  #user = User.objects.order_by('username')
   user = request.user
+  userown = ''
+
+  if str(user) != 'AnonymousUser':
+    userown = Deployment.objects.filter(user=user)
+    for k in userown:
+      k.status = 'on' if k.status == True else 'off'
+
+  #select
+  gpulist = GPU.objects.order_by('id')
+  imagelist = Image.objects.values('name').distinct()
 
 
 
-  for g in gpu:
-    g.used = 'ready' if g.used == False else 'used'
 
-  data = {'gpu':gpu}
+  data = {'gpu':gpulist,'image':imagelist,'userown':userown}
+
+
+
+
   response = render(request, 'server/index.html',data)
 
   return response
 
+
+
+
+
+
+
+
+
+
+
+
 def select(request):
-  #det data from database
+  #get data from database
+  print("current time : " + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+
   gpulist = GPU.objects.order_by('id')
   imagelist = Image.objects.values('name').distinct()
   error = []
@@ -37,16 +62,18 @@ def select(request):
     #get inputs
     user = request.user
     cname = request.POST.get('cname')
-    gpuid = request.POST.getlist('gpuselect')   #might have 1+ GPU(s)
+    gpuid = request.POST.getlist('gpuselect')
     ram = request.POST.get('ram')
     ram = int(ram)
     image = request.POST.get('imageselect')
     wrong = 0   #good or not
 
     #textbox filled check
+    '''
     if len(gpuid) == 0:
       error.append('please choose GPUs')
       wrong = 1
+    '''
     if ram <= 0:
       error.append('please import some number meaningful')
       wrong = 1
@@ -68,7 +95,11 @@ def select(request):
 
     #everything's good
     if wrong == 0:
-      #Deployment.objects.create(name=cname, user=user, ram=ram, image=Image.objects.get(name=image))
+      usage = Port_in_use.objects.get(used='0')
+      port_now = usage.port
+      port_next = str(int(usage.port) + 1)
+
+      Deployment.objects.create(name=cname, user=user, ram=ram, image=Image.objects.get(name=image),port=port_now)
       free_mem.number -= ram
       #free_mem.save()
 
@@ -88,17 +119,14 @@ def select(request):
         y['spec']['template']['metadata']['labels']['app'] = uplusname
         y['spec']['template']['spec']['containers'][0]['image'] = image
         y['spec']['template']['spec']['containers'][0]['resources']['limits']['memory'] = str(ram) + 'Gi'
+        y['spec']['template']['spec']['containers'][0]['resources']['limits']['nvidia.com/gpu'] = len(gpuid)
         y['spec']['template']['spec']['containers'][0]['resources']['requests']['memory'] = str(ram/2) + 'Gi'
 
 
         with open('/home/nmg/webserver/yamlfiles/'+uplusname+'.yaml', 'w') as e:
           yaml.dump(y,e)
 
-      usage = Port_in_use.objects.get(used='0')
-      port_now = usage.port
-      port_next = str(int(usage.port) + 1)
-
-      os.system("kubectl create -f /home/nmg/webserver/yamlfiles/"+str(user)+"-"+uplusname+".yaml")
+      os.system("kubectl create -f /home/nmg/webserver/yamlfiles/"+uplusname+".yaml")
       os.system("kubectl expose deploy " +uplusname+ " --type LoadBalancer --external-ip=140.128.101.13 --port "+port_now +" --target-port 22")
 
       usage.used = True
@@ -108,6 +136,7 @@ def select(request):
       '''
       gpu.save()
       '''
+      print("current time : " + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
 
       return redirect('index')
 
@@ -122,8 +151,29 @@ def respond(request):
 
 def save(request):
   user = request.user
+  data = {}
 
-  return render(request, 'server/save.html')
+  if request.method == 'POST':
+    save = request.POST.get('btn_sav')
+    user = str(user)
+    savestr = "k8s_" + user + "-" + save + "_"
+
+    k = os.popen("ssh ctaserver docker ps -aqf name="+savestr)
+    cid = k.read(12)
+    k.close()
+    print(cid)
+
+    date = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')    #docker image tag cannot contain ":"
+    print(date)
+    uplusname = user+"-"+save
+
+    os.system("ssh ctaserver docker commit "+cid+" "+uplusname+":"+date)
+    os.system("ssh ctaserver docker save -o /home/nmg/saves/"+uplusname+"-"+date+".tar "+uplusname+":"+date)
+
+    data = {'save':save}
+    return redirect('index')
+
+  return render(request, 'server/save.html',data)
 
 def blank(request):
 

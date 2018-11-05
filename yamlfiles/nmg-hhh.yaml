@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: nmg-hhh}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: nmg-hhh}
+  template:
+    metadata:
+      labels: {app: nmg-hhh}
+    spec:
+      containers:
+      - image: ashspencil/k8s-ml:9.0-cudnn7-devel-ssh
+        name: nmg-hhh
+        ports:
+        - {containerPort: 22, name: ssh}
+        resources:
+          limits: {memory: 33Gi, nvidia.com/gpu: 1}
+          requests: {memory: 16.5Gi}
+      nodeSelector: {accelerator2: nvidia-tesla-k20x}

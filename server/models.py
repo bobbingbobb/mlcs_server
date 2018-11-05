@@ -33,6 +33,7 @@ class Deployment(models.Model):
   ram = models.IntegerField(default=0)
   image = models.ForeignKey(Image,on_delete=models.CASCADE, null=True)
   test = models.CharField(max_length=20, default='a')
+  port = models.IntegerField(default=0)
   status = models.BooleanField(default=True)
 
   def __str__(self):

@@ -21,7 +21,7 @@ spec:
           containerPort: 22
         resources:
           limits:
-            nvidia.com/gpu: 1
+            nvidia.com/gpu: 
             memory:
           requests:
             memory:

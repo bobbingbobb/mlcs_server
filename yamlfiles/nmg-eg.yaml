@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
-metadata: {name: nmg-test}
+metadata: {name: nmg-eg}
 spec:
   replicas: 1
   selector:
-    matchLabels: {app: nmg-test}
+    matchLabels: {app: nmg-eg}
   template:
     metadata:
-      labels: {app: nmg-test}
+      labels: {app: nmg-eg}
     spec:
       containers:
-      - image: test_img:latest
-        name: nmg-test
+      - image: eg_sshd:latest
+        name: nmg-eg
         ports:
         - {containerPort: 22, name: ssh}
         resources:

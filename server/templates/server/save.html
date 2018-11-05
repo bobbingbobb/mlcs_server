@@ -6,7 +6,7 @@
   </head>
   <body>
     <form action="{% url 'save' %}" method="post">
-    	{% csrf_token %}} 
+    	{% csrf_token %}
       <input type="submit" value="select" />
     </form>
     <form action="{% url 'save' %}">
@@ -15,23 +15,8 @@
     <input type ="button" onclick="javascript:location.href='{% url 'index' %}'" value="back"></input>
     <input type ="button" onclick="javascript:location.href='{% url 'select' %}'" value="save"></input>
     <br><br>
-    <table border="1">
-      <thead>
-        <tr>
-  	  <td>ID</td>
-	  <td>Name</td>
-	  <td>State</td>
-	</tr>
-      </thead>
-      <tbody>
-        {% for d in gpu %}
-	<tr>
-	  <td>{{ d.id }}</td>
-	  <td>{{ d.name }}</td>
-	  <td>{{ d.used }}</td>
-	</tr>
-        {% endfor %}
-      </tbody>
-    </table>
+
+    <p>{{ save }}</p>
+
   </body>
 </html>

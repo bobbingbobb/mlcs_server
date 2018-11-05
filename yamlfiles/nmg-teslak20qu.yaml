@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: nmg-teslak20qu}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: nmg-teslak20qu}
+  template:
+    metadata:
+      labels: {app: nmg-teslak20qu}
+    spec:
+      containers:
+      - image: ashspencil/k8s-ml:9.0-cudnn7-devel-ssh
+        name: nmg-teslak20qu
+        ports:
+        - {containerPort: 22, name: ssh}
+        resources:
+          limits: {memory: 5Gi, nvidia.com/gpu: 1}
+          requests: {memory: 2.5Gi}
+      nodeSelector: {accelerator3: nvidia-quadro-k620}
