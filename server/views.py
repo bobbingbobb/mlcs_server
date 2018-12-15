@@ -18,23 +18,18 @@ def index(request):
   user = request.user
   userown = ''
 
+  #dashboard
   if str(user) != 'AnonymousUser':
-    userown = Deployment.objects.filter(user=user)
-    for k in userown:
-      k.status = 'on' if k.status == True else 'off'
+    if Deployment.objects.filter(user=user).count() != 0:   #if the user has any container
+      userown = Deployment.objects.filter(user=user)
+      for k in userown:
+        k.status = 'on' if k.status == True else 'off'
 
   #select
   gpulist = GPU.objects.order_by('id')
   imagelist = Image.objects.values('name').distinct()
 
-
-
-
   data = {'gpu':gpulist,'image':imagelist,'userown':userown}
-
-
-
-
   response = render(request, 'server/index.html',data)
 
   return response
@@ -68,12 +63,6 @@ def select(request):
     image = request.POST.get('imageselect')
     wrong = 0   #good or not
 
-    #textbox filled check
-    '''
-    if len(gpuid) == 0:
-      error.append('please choose GPUs')
-      wrong = 1
-    '''
     if ram <= 0:
       error.append('please import some number meaningful')
       wrong = 1
@@ -183,22 +172,23 @@ def blank(request):
 
 def sign(request):
   if request.method == 'POST':
-    form = auth.forms.UserCreationForm(request.POST)
+    form = auth.forms.UserCreationForm(request.POST)    #authenticate username and passwd
 
     if form.is_valid():
-      form.save()
+      form.save()   #create a user object and store into db
       username = form.cleaned_data['username']
       password = form.cleaned_data['password1']
       user = authenticate(username=username, password=password)
-      server_login(request, user)
+      server_login(request, user)   #login
       return redirect('index')
 
   else:
-    form = auth.forms.UserCreationForm()
+    form = auth.forms.UserCreationForm()    #using usercreate middleware
 
-  data = {'text':form}
+  data = {'text':form}  #pass the special form to html
   print(data);
   return render(request, 'registration/sign.html', data)
+
 '''
 def login(request):
   return render(request, 'registration/login.html')
