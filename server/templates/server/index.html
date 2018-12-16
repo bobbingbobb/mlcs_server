@@ -62,13 +62,15 @@
 		<br><hr>
 		<!--登出-->
 		<button type="button" class="btn btn-outline-danger btn-sm btn-block" onclick="javascript:location.href='{% url 'logout' %}'">Logout</button>
+    </div>
+    <div class="col-10 box">
     {% else %}
     <button type="button" class="btn btn-outline-dark btn-sm btn-block" onclick="javascript:location.href='{% url 'sign' %}'">SignUp</button>
     <br><hr>
     <button type="button" class="btn btn-outline-danger btn-sm btn-block" onclick="javascript:location.href='{% url 'login' %}'">Login</button>
-    {% endif %}
     </div>
-    <div class="col-10">
+    <div class="col-10 box" style="background-image:url(https://www.corsi-formazione-como.it/wp-content/uploads/2017/06/formadhoc-intelligenza-artificiale-rete-neuronale.jpg);width:960px;height:600px;background-size: 100% 100%;background-image:rgba(0,0,0,0.2);background-position:center center;" >
+    {% endif %}
 
 	    <div class="tab-content" id="v-pills-tabContent">
 
@@ -131,11 +133,16 @@
         </tbody>
       </table>
       {% else %}
+      <table class="table table-striped table-hover" style="table-layout:fixed">
       <p>You've got no container</p>
+      </table>
       {% endif %}
       {% else %}
-      <p>Welcome to MLCS</p>
-      <p>please login or register</p>
+      <div style="color:white;">
+        <br>
+        <p>WELCOME TO MLCS</p>
+        <p>PLEASE LOGIN OR REGISTER</p>
+      </div>
 
       {% endif %}
 
