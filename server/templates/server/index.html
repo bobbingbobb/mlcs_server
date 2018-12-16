@@ -77,15 +77,15 @@
 
       {% if user.is_authenticated %}
       {% if userown != '' %}
-      <table border="1">
+      <table class="table table-striped table-hover" style="table-layout:fixed">
         <thead>
           <tr>
-  	  <td>Name</td>
-      <td>Ram</td>
-      <td>Port</td>
-  	  <td>Save</td>
-      <td>Delete</td>
-      <td>Restore</td>
+  	  <th scope="col" width="20%">Name</th>
+      <th scope="col" width="7%">Ram</th>
+      <th scope="col" width="10%">Port</th>
+  	  <th scope="col" width="18%">Save</th>
+      <th scope="col" width="20%">Delete</th>
+      <th scope="col" width="20%">Restore</th>
   	</tr>
         </thead>
         <form id="save" action="{% url 'save' %}" method="post">{% csrf_token %}</form>
@@ -95,9 +95,9 @@
         <tbody>
           {% for u in userown %}
   	<tr>
-  	  <td>{{ u.name }}</td>
-      <td>{{ u.ram }}</td>
-      <td>{{ u.port }}</td>
+  	  <td align="left">{{ u.name }}</td>
+      <td align="center">{{ u.ram }}</td>
+      <td align="center">{{ u.port }}</td>
       <td>
         <button type="submit" name="btn_sav" form="save" value="{{ u.name }}" class="btn btn-outline-success btn-sm btn-block" >save</button>
       </td>
@@ -112,14 +112,19 @@
         {% endif %}
       </td>
       {% if u.id == restore %}
-      <td>
+      <tr>
+      <td></td><td></td><td></td><td></td>
+      <td align="center">
       <select form="load" name=tarselect>
       {% for b in backup %}
       <option value="{{ b.repo }}+{{ b.tag }}">{{ b.tag }}</option>
       {% endfor %}
       <select>
+      </td>
+      <td>
       <button type="submit" name="btn_rst" form="load" class="btn btn-info btn-sm btn-block" >load</button>
       </td>
+    </tr>
       {% endif %}
     </tr>
           {% endfor %}
@@ -141,39 +146,45 @@
       <form action="{% url 'select' %}" method="post">
         {% csrf_token %}
         <HR>
-        <h4>name of container</h4>
-        name: <input type="text" name="cname" required autofocus>
+        <h4>Name of the Container</h4>
+        <div div class="form-row">
+  	  <div class="form-group" col-md-3>
+        name: <input class="form-control" type="text" name="cname" required autofocus>
+  	  </div>
+      </div>
         <HR>
-        <h4>GPU</h4>
+        <h4>GPU Select</h4>
         <table>
           {% for g in gpu %}
-            <input type="checkbox" name="gpuselect" value="{{ g.id }}">{{ g.name }}<br>
+  		<div class="form-check">
+            <input class="form-check-input" type="checkbox" name="gpuselect" value="{{ g.id }}">{{ g.name }}<br>
+  		</div>
           {% endfor %}
         </table>
         <HR>
-        <h4>RAM</h4>
-        ram: <input type="text" name="ram" required>Gb
+        <h4>RAM Select</h4>
+      <div div class="form-row">
+  	  <div class="form-group" col-md-3>
+        unit:GB <input type="text" class="form-control" name="ram" required>
+  	  </div>
+      </div>
         <HR>
-        <h4>image</h4>
-        <select name=imageselect>
+        <h4>Image Select</h4>
+        <div div class="form-row">
+        <div class="form-group" col-md-3>
+        <select class="form-control" name=imageselect>
           {% for i in image %}
             <option value="{{ i.name }}">{{ i.name }}</option>
           {% endfor %}
         </select>
+        </div>
+        </div>
         <HR>
           {% for e in error %}
             <p style="color: red">{{ e }}</p>
           {% endfor %}
-        <input type="submit" value="add" name="submit" onclick="alert('connect address : mlcs.cs.thu.edu.tw\nuser : root\ndefault passwd : mlverygood\nhighly recommand to change the passwd')">
+        <input class="btn btn-outline-secondary" type="submit" value="Add" name="submit" onclick="alert('connect address : mlcs.cs.thu.edu.tw\nuser : root\ndefault passwd : mlverygood\nhighly recommand to change the passwd')">
       </form>
-		  </div>
-
-		  <div class="tab-pane fade" id="v-pills-settings" role="tabpanel"
-		  aria-labelledby="v-pills-settings1-tab">
-		  </div>
-
-		  <div class="tab-pane fade" id="v-pills-settings" role="tabpanel"
-		  aria-labelledby="v-pills-settings2-tab">
 		  </div>
 
         </div>

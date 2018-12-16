@@ -10,7 +10,7 @@ spec:
       labels: {app: nmg-test}
     spec:
       containers:
-      - image: ashspencil/demos:v1
+      - image: ashspencil/centos-ssh:v1
         name: nmg-test
         ports:
         - {containerPort: 22, name: ssh}
