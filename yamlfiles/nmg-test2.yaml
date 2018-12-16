@@ -15,6 +15,6 @@ spec:
         ports:
         - {containerPort: 22, name: ssh}
         resources:
-          limits: {memory: 8Gi, nvidia.com/gpu: 2}
-          requests: {memory: 4.0Gi}
-      nodeSelector: {accelerator2: nvidia-tesla-k20x, accelerator3: nvidia-quadro-k620}
+          limits: {memory: 5Gi, nvidia.com/gpu: 0}
+          requests: {memory: 2.5Gi}
+      nodeSelector: {}

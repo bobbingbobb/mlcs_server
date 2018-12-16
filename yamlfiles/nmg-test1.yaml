@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
-metadata: {name: nmg-333}
+metadata: {name: nmg-test1}
 spec:
   replicas: 1
   selector:
-    matchLabels: {app: nmg-333}
+    matchLabels: {app: nmg-test1}
   template:
     metadata:
-      labels: {app: nmg-333}
+      labels: {app: nmg-test1}
     spec:
       containers:
-      - image: ashspencil/k8s-ml:9.0-cudnn7-devel-ssh
-        name: nmg-333
+      - image: ubuntu:16.04
+        name: nmg-test1
         ports:
         - {containerPort: 22, name: ssh}
         resources:

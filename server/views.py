@@ -2,7 +2,7 @@
 from django.contrib import auth
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
-from .models import GPU, Image, Port_in_use, Deployment, Counter
+from .models import GPU, Image, Port_in_use, Deployment, Counter, Cimage
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, logout, login as server_login
 from django.contrib.auth.models import User
@@ -22,15 +22,29 @@ def index(request):
   if str(user) != 'AnonymousUser':
     if Deployment.objects.filter(user=user).count() != 0:   #if the user has any container
       userown = Deployment.objects.filter(user=user)
-      for k in userown:
-        k.status = 'on' if k.status == True else 'off'
 
   #select
   gpulist = GPU.objects.order_by('id')
   imagelist = Image.objects.values('name').distinct()
 
-  data = {'gpu':gpulist,'image':imagelist,'userown':userown}
+  try:
+    if request.COOKIES["restore"] != "None":
+      restore = int(request.COOKIES["restore"])
+    else:
+      restore = 0
+  except KeyError:
+    restore = 0
+
+  try:
+    cname = Deployment.objects.get(id=restore)
+    repo = str(user)+'-'+cname.name
+    backup = Cimage.objects.filter(repo=repo)
+  except ObjectDoesNotExist:
+    backup = {}
+
+  data = {'gpu':gpulist,'image':imagelist,'userown':userown,'restore':restore,'backup':backup}
   response = render(request, 'server/index.html',data)
+  response.set_cookie('restore',0)
 
   return response
 
@@ -52,6 +66,7 @@ def select(request):
   gpulist = GPU.objects.order_by('id')
   imagelist = Image.objects.values('name').distinct()
   error = []
+  message = ''
 
   if request.method == 'POST':
     #get inputs
@@ -130,7 +145,7 @@ def select(request):
       return redirect('index')
 
 
-  data = {'gpu':gpulist,'image':imagelist,'error':error}
+  data = {'gpu':gpulist,'image':imagelist,'error':error,'message':message}
 
   return render(request, 'server/select.html',data)
 
@@ -152,17 +167,71 @@ def save(request):
     k.close()
     print(cid)
 
-    date = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')    #docker image tag cannot contain ":"
-    print(date)
-    uplusname = user+"-"+save
+    tag = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')    #docker image tag cannot contain ":"
+    print(tag)
+    repo = user+"-"+save
 
-    os.system("ssh ctaserver docker commit "+cid+" "+uplusname+":"+date)
-    os.system("ssh ctaserver docker save -o /home/nmg/saves/"+uplusname+"-"+date+".tar "+uplusname+":"+date)
+    deployment = Deployment.objects.get(name=save, user=request.user)
+    deployment.backup = True
+    deployment.save()
+    Cimage.objects.create(repo=repo, tag=tag)
+
+    repotag = repo+":"+tag
+    os.system("ssh ctaserver docker commit "+cid+" "+repotag)
+    os.system("ssh ctaserver docker save -o /home/nmg/saves/"+repo+"-"+tag+".tar "+repotag)
+    os.system("ssh ctaserver docker image rm "+repotag)
 
     data = {'save':save}
     return redirect('index')
 
+
   return render(request, 'server/save.html',data)
+
+def restore(request):
+  if request.method == 'POST':
+    response = redirect('index')
+    response.set_cookie('restore',request.POST.get('btn_restore'))
+
+    return response
+
+def load(request):
+  user = request.user
+  data = {}
+
+  if request.method == 'POST':
+    load = request.POST.get('tarselect')
+    repo_tag = load.split('+')
+
+    os.system("kubectl delete deployment "+repo_tag[0])
+
+    tarname = load.replace('+','-')
+    os.system("ssh ctaserver docker load -i /home/nmg/saves/"+tarname+".tar")
+
+    u_name = repo_tag[0].split('-')
+    deployment = Deployment.objects.get(name=u_name[1], user=user)
+    os.system("kubectl run "+repo_tag[0]+" --image="+repo_tag[0]+":"+repo_tag[1])
+    port = str(deployment.port)
+    print(port)
+    os.system("kubectl expose deploy " +repo_tag[0]+ " --type LoadBalancer --external-ip=140.128.101.13 --port "+port+" --target-port 22")
+
+  return redirect('index')
+
+def delete(request):
+  if request.method == 'POST':
+    cname = request.POST.get('btn_del')
+    user = request.user
+
+    deployment = Deployment.objects.get(name=cname, user=user)
+    user = str(user)
+    repo = user+"-"+cname
+    backup = Cimage.objects.filter(repo=repo)
+    for b in backup:
+      b.delete()
+    deployment.delete()
+
+    os.system("kubectl delete deployment "+user+"-"+cname)
+
+    return redirect('index')
 
 def blank(request):
 
@@ -188,6 +257,8 @@ def sign(request):
   data = {'text':form}  #pass the special form to html
   print(data);
   return render(request, 'registration/sign.html', data)
+
+
 
 '''
 def login(request):

@@ -80,31 +80,50 @@
       <table border="1">
         <thead>
           <tr>
-    	  <td>ID</td>
   	  <td>Name</td>
       <td>Ram</td>
       <td>Port</td>
-  	  <td>State</td>
-      <td></td>
+  	  <td>Save</td>
+      <td>Delete</td>
+      <td>Restore</td>
   	</tr>
         </thead>
-        <form action="{% url 'save' %}" method="post">
-          {% csrf_token %}
+        <form id="save" action="{% url 'save' %}" method="post">{% csrf_token %}</form>
+        <form id="load" action="{% url 'load' %}" method="post">{% csrf_token %}</form>
+        <form id="delete" action="{% url 'delete' %}" method="post">{% csrf_token %}</form>
+        <form id="restore" action="{% url 'restore' %}" method="post">{% csrf_token %}</form>
         <tbody>
           {% for u in userown %}
   	<tr>
-  	  <td>{{ u.id }}</td>
   	  <td>{{ u.name }}</td>
       <td>{{ u.ram }}</td>
       <td>{{ u.port }}</td>
-  	  <td>{{ u.status }}</td>
       <td>
-        <button type="submit" name="btn_sav" value="{{ u.name }}" class="btn btn-outline-danger btn-sm btn-block" >save</button>
+        <button type="submit" name="btn_sav" form="save" value="{{ u.name }}" class="btn btn-outline-success btn-sm btn-block" >save</button>
       </td>
-  	</tr>
+      <td>
+        <button type="submit" name="btn_del" form="delete" value="{{ u.name }}" class="btn btn-outline-danger btn-sm btn-block" >delete</button>
+      </td>
+      <td>
+        {% if u.backup %}
+        <button type="submit" name="btn_restore" form="restore" value="{{ u.id }}" class="btn btn-outline-primary btn-sm btn-block" >restore</button>
+        {% else %}
+        <button class="btn btn-outline-secondary btn-sm btn-block" disabled>restore</button>
+        {% endif %}
+      </td>
+      {% if u.id == restore %}
+      <td>
+      <select form="load" name=tarselect>
+      {% for b in backup %}
+      <option value="{{ b.repo }}+{{ b.tag }}">{{ b.tag }}</option>
+      {% endfor %}
+      <select>
+      <button type="submit" name="btn_rst" form="load" class="btn btn-info btn-sm btn-block" >load</button>
+      </td>
+      {% endif %}
+    </tr>
           {% endfor %}
         </tbody>
-      </form>
       </table>
       {% else %}
       <p>You've got no container</p>
@@ -145,7 +164,7 @@
           {% for e in error %}
             <p style="color: red">{{ e }}</p>
           {% endfor %}
-        <input type="submit" value="add" name="submit">
+        <input type="submit" value="add" name="submit" onclick="alert('connect address : mlcs.cs.thu.edu.tw\nuser : root\ndefault passwd : mlverygood\nhighly recommand to change the passwd')">
       </form>
 		  </div>
 

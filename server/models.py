@@ -34,10 +34,10 @@ class Deployment(models.Model):
   image = models.ForeignKey(Image,on_delete=models.CASCADE, null=True)
   test = models.CharField(max_length=20, default='a')
   port = models.IntegerField(default=0)
-  status = models.BooleanField(default=True)
+  backup = models.BooleanField(default=False)
 
   def __str__(self):
-    return '<ID : {}, name : {}, user : {}, ram : {}, image : {}, status : {}>'.format(self.id, self.name, self.user, self.ram, self.image, self.status)
+    return '<ID : {}, name : {}, user : {}, ram : {}, image : {}, port : {}, backup : {}>'.format(self.id, self.name, self.user, self.ram, self.image, self.port, self.backup)
 
 class Counter(models.Model):
   name = models.CharField(max_length=20)
@@ -45,3 +45,10 @@ class Counter(models.Model):
 
   def __str__(self):
     return '<ID : {}, name : {}, number : {}>'.format(self.id, self.name, self.number)
+
+class Cimage(models.Model):
+  repo = models.CharField(max_length=50)
+  tag = models.CharField(max_length=20)
+
+  def __str__(self):
+    return '<ID : {}, repo : {}, tag : {}>'.format(self.id, self.repo, self.tag)

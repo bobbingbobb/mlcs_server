@@ -10,11 +10,11 @@ spec:
       labels: {app: nmg-test}
     spec:
       containers:
-      - image: test_img:latest
+      - image: ashspencil/demos:v1
         name: nmg-test
         ports:
         - {containerPort: 22, name: ssh}
         resources:
-          limits: {memory: 4Gi, nvidia.com/gpu: 1}
-          requests: {memory: 2.0Gi}
-      nodeSelector: {accelerator4: nvidia-quadro-k620}
+          limits: {memory: 5Gi, nvidia.com/gpu: 0}
+          requests: {memory: 2.5Gi}
+      nodeSelector: {}

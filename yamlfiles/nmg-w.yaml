@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
-metadata: {name: nmg-333}
+metadata: {name: nmg-w}
 spec:
   replicas: 1
   selector:
-    matchLabels: {app: nmg-333}
+    matchLabels: {app: nmg-w}
   template:
     metadata:
-      labels: {app: nmg-333}
+      labels: {app: nmg-w}
     spec:
       containers:
       - image: ashspencil/k8s-ml:9.0-cudnn7-devel-ssh
-        name: nmg-333
+        name: nmg-w
         ports:
         - {containerPort: 22, name: ssh}
         resources:
-          limits: {memory: 2Gi, nvidia.com/gpu: 0}
-          requests: {memory: 1.0Gi}
+          limits: {memory: 4Gi, nvidia.com/gpu: 0}
+          requests: {memory: 2.0Gi}
       nodeSelector: {}
