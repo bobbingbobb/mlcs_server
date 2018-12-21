@@ -1,8 +1,0 @@
-main_page : {
-  -login,
-  -sign_up
-}
-  dashboard : {
-    -
-  }
-

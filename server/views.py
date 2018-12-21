@@ -11,6 +11,7 @@ import os
 import string
 import re
 import yaml
+import time
 from django.core.files import File
 
 
@@ -203,6 +204,8 @@ def load(request):
     repo_tag = load.split('+')
 
     os.system("kubectl delete deployment "+repo_tag[0])
+    os.system("kubectl delete svc "+repo_tag[0])
+    time.sleep(15)
 
     tarname = load.replace('+','-')
     os.system("ssh ctaserver docker load -i /home/nmg/saves/"+tarname+".tar")
@@ -210,8 +213,8 @@ def load(request):
     u_name = repo_tag[0].split('-')
     deployment = Deployment.objects.get(name=u_name[1], user=user)
     os.system("kubectl run "+repo_tag[0]+" --image="+repo_tag[0]+":"+repo_tag[1])
+
     port = str(deployment.port)
-    print(port)
     os.system("kubectl expose deploy " +repo_tag[0]+ " --type LoadBalancer --external-ip=140.128.101.13 --port "+port+" --target-port 22")
 
   return redirect('index')
@@ -222,12 +225,15 @@ def delete(request):
     user = request.user
 
     deployment = Deployment.objects.get(name=cname, user=user)
+    free_mem = Counter.objects.get(name='free_mem')
+    free_mem.number += deployment.ram
     user = str(user)
     repo = user+"-"+cname
     backup = Cimage.objects.filter(repo=repo)
     for b in backup:
       b.delete()
     deployment.delete()
+    free_mem.save()
 
     os.system("kubectl delete deployment "+user+"-"+cname)
 

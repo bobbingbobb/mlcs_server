@@ -34,7 +34,7 @@
   <div class"cotainer-fluid">
     <div class="row">
 	  <!--帳號相關資訊欄-->
-	  <div class="col-2">
+	  <div class="col-2" style="left:7px">
 		<!--上車圖區-->
 		<br>
 	    <figure class="figure">
@@ -63,14 +63,14 @@
 		<!--登出-->
 		<button type="button" class="btn btn-outline-danger btn-sm btn-block" onclick="javascript:location.href='{% url 'logout' %}'">Logout</button>
     </div>
-    <div class="col-10 box">
+    <div class="col-10 box" style="background:url(http://140.128.101.227/file/photo1.jpg);width:9800px;height:1200px;background-size:100%;background-repeat:no-repeat;">
     {% else %}
     <button type="button" class="btn btn-outline-dark btn-sm btn-block" onclick="javascript:location.href='{% url 'sign' %}'">SignUp</button>
     <br><hr>
     <button type="button" class="btn btn-outline-danger btn-sm btn-block" onclick="javascript:location.href='{% url 'login' %}'">Login</button>
     </div>
-    <div class="col-10 box">
-      <img src="http://140.128.101.227/file/photo.jpg" class="figure-img img-fluid">
+    <div class="col-10 box" style="background:url(http://140.128.101.227/file/photo.jpg);width:9800px;height:1200px;background-size:100%;background-repeat:no-repeat;">
+
     {% endif %}
 
 	    <div class="tab-content" id="v-pills-tabContent">
@@ -84,7 +84,7 @@
         <thead>
           <tr>
   	  <th scope="col" width="20%">Name</th>
-      <th scope="col" width="7%">Ram</th>
+      <th scope="col" width="7%">RAM</th>
       <th scope="col" width="10%">Port</th>
   	  <th scope="col" width="18%">Save</th>
       <th scope="col" width="20%">Delete</th>
@@ -138,13 +138,6 @@
       <p>You've got no container</p>
       </table>
       {% endif %}
-      {% else %}
-      <div style="color:white;">
-        <br>
-        <p>WELCOME TO MLCS</p>
-        <p>PLEASE LOGIN OR REGISTER</p>
-      </div>
-
       {% endif %}
 
 		  </div>
