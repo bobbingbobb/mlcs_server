@@ -25,7 +25,7 @@ def index(request):
       userown = Deployment.objects.filter(user=user)
 
   #select
-  gpulist = GPU.objects.order_by('id')
+  gpulist = GPU.objects.filter(used=False)
   imagelist = Image.objects.values('name').distinct()
 
   try:
@@ -67,6 +67,7 @@ def select(request):
   gpulist = GPU.objects.order_by('id')
   imagelist = Image.objects.values('name').distinct()
   error = []
+  gpu_use = ''
   message = ''
 
   if request.method == 'POST':
@@ -104,17 +105,22 @@ def select(request):
       port_now = usage.port
       port_next = str(int(usage.port) + 1)
 
-      Deployment.objects.create(name=cname, user=user, ram=ram, image=Image.objects.get(name=image),port=port_now)
-      free_mem.number -= ram
-      #free_mem.save()
-
       with open('/home/nmg/webserver/yamlfiles/example.yaml', 'r') as f:
         y = yaml.load(f) #dict
 
         node = {}
         for g in gpuid:
           gpu = GPU.objects.get(id=g)
+          gpu_use += str(gpu.id)
+          gpu_use += '+'
+          gpu.used = True
+          gpu.save()
           node[gpu.label] = gpu.accel
+
+        Deployment.objects.create(name=cname, user=user, ram=ram, image=Image.objects.get(name=image),port=port_now,gpu_inuse=gpu_use)
+        free_mem.number -= ram
+        free_mem.save()
+
         y['spec']['template']['spec']['nodeSelector'] = node
 
         uplusname = str(user)+"-"+cname
@@ -138,10 +144,9 @@ def select(request):
 
       Port_in_use.objects.create(port=port_next)
       usage.save()
-      '''
-      gpu.save()
-      '''
+
       print("current time : " + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+      print(gpu_use)
 
       return redirect('index')
 
@@ -223,6 +228,7 @@ def delete(request):
   if request.method == 'POST':
     cname = request.POST.get('btn_del')
     user = request.user
+    ram = Counter.objects.get(name='free_mem')
 
     deployment = Deployment.objects.get(name=cname, user=user)
     free_mem = Counter.objects.get(name='free_mem')
@@ -230,6 +236,15 @@ def delete(request):
     user = str(user)
     repo = user+"-"+cname
     backup = Cimage.objects.filter(repo=repo)
+    dg = deployment.gpu_inuse
+    gpu_use = dg.split('+')
+    gpu_use.pop()
+    print(gpu_use)
+    print(type(gpu_use))
+    for g in gpu_use:
+      gpu = GPU.objects.get(id=int(g))
+      gpu.used = False
+      gpu.save()
     for b in backup:
       b.delete()
     deployment.delete()

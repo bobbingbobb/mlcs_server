@@ -12,7 +12,7 @@ class GPU(models.Model):
   accel = models.CharField(max_length=20, default="")
 
   def __str__(self):
-    return '<ID : {}, GPU : {}, available : {}, label : {}, expose : {}, accel : {}>'.format(self.id, self.name, self.used, self.label, self.expose, self.accel)
+    return '<ID : {}, name : {}, used : {}, label : {}, vram : {}, expose : {}, accel : {}>'.format(self.id, self.name, self.used, self.label, self.vram, self.expose, self.accel)
 
 class Image(models.Model):
   name = models.CharField(max_length=60)
@@ -32,12 +32,12 @@ class Deployment(models.Model):
   user = models.ForeignKey(User,on_delete=models.CASCADE, null=True)
   ram = models.IntegerField(default=0)
   image = models.ForeignKey(Image,on_delete=models.CASCADE, null=True)
-  test = models.CharField(max_length=20, default='a')
+  gpu_inuse = models.CharField(max_length=20,default='+')
   port = models.IntegerField(default=0)
   backup = models.BooleanField(default=False)
 
   def __str__(self):
-    return '<ID : {}, name : {}, user : {}, ram : {}, image : {}, port : {}, backup : {}>'.format(self.id, self.name, self.user, self.ram, self.image, self.port, self.backup)
+    return '<ID : {}, name : {}, user : {}, ram : {}, image : {}, gpu_inuse : {}, port : {}, backup : {}>'.format(self.id, self.name, self.user, self.ram, self.image, self.gpu_inuse, self.port, self.backup)
 
 class Counter(models.Model):
   name = models.CharField(max_length=20)
