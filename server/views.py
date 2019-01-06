@@ -239,8 +239,7 @@ def delete(request):
     dg = deployment.gpu_inuse
     gpu_use = dg.split('+')
     gpu_use.pop()
-    print(gpu_use)
-    print(type(gpu_use))
+
     for g in gpu_use:
       gpu = GPU.objects.get(id=int(g))
       gpu.used = False
@@ -251,6 +250,7 @@ def delete(request):
     free_mem.save()
 
     os.system("kubectl delete deployment "+user+"-"+cname)
+    os.system("kubectl delete svc "+user+"-"+cname)
 
     return redirect('index')
 

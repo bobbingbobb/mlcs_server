@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: helen-hehe}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: helen-hehe}
+  template:
+    metadata:
+      labels: {app: helen-hehe}
+    spec:
+      containers:
+      - image: ashspencil/eg_sshd:v1
+        name: helen-hehe
+        ports:
+        - {containerPort: 22, name: ssh}
+        resources:
+          limits: {memory: 8Gi, nvidia.com/gpu: 1}
+          requests: {memory: 4.0Gi}
+      nodeSelector: {accelerator: nvidia-tesla-k20}

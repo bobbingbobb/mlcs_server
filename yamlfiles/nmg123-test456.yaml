@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: nmg123-test456}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: nmg123-test456}
+  template:
+    metadata:
+      labels: {app: nmg123-test456}
+    spec:
+      containers:
+      - image: ashspencil/eg_sshd:v1
+        name: nmg123-test456
+        ports:
+        - {containerPort: 22, name: ssh}
+        resources:
+          limits: {memory: 20Gi, nvidia.com/gpu: 1}
+          requests: {memory: 10.0Gi}
+      nodeSelector: {accelerator4: nvidia-quadro-k620}
